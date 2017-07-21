@@ -64,16 +64,19 @@ url_headers = {'Content-Type': 'application/json', 'Accept': 'application/json' 
 request_url="{}://{}{}".format(protocol, URL_BASE, URL)
 if args.verbose: print "Request_url: \"{}\"".format(request_url)
 
+if args.message:
+  device_message     = args.message
+else:
+  device_message       = "Intial device add",
+
+
 device_data = dict(
   ip_addr       = args.device_ip,
   os_name       = args.device_os,
   serial_number = args.device_sn,
   hw_model      = "accton_as4610_54",
   os_version    = "2.0.0-2017-07-19.1529-40fc82b_armel",
-  if args.message:
-    message     = args.message
-  else:
-    message       = "Intial device add",
+  message       = device_message,
   state         = args.device_status
 )
 json_string = json.dumps(device_data)
