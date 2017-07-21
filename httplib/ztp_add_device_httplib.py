@@ -54,10 +54,8 @@ if args.ztp_host:
   hostname = '{}'.format(args.ztp_host)
 if args.ztp_port:
   port = '{}'.format(args.ztp_port)
-if args.ssl:
-  protocol="https"
-else:
-  protocol="http"
+
+protocol="http"
 
 URL_BASE = '{}:{}'.format(hostname, port)
 URL = '/api/devices'
