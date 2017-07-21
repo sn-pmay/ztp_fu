@@ -32,6 +32,7 @@ parser.add_argument('--ztp_port', help='Remote host port against which to run. D
 parser.add_argument('--device_ip', help='The device IP for which to set the status', required=True)
 parser.add_argument('--device_os', help='The device OS', required=True)
 parser.add_argument('--device_sn', help='The device SN')
+parser.add_argument('--device_hw', help='The device hardware')
 parser.add_argument('--device_message', help='Optional message to be included')
 parser.add_argument('--device_status', help='Device state/status. Valid states/statuses are: {}'.format(statuses), required=True)
 parser.add_argument('--verbose', help='Make things chatty. Note: May display sensitive data like password', action='store_true')
@@ -64,17 +65,21 @@ url_headers = {'Content-Type': 'application/json', 'Accept': 'application/json' 
 request_url="{}://{}{}".format(protocol, URL_BASE, URL)
 if args.verbose: print "Request_url: \"{}\"".format(request_url)
 
-if args.message:
-  device_message     = args.message
+if args.device_message:
+  device_message     = args.device_message
 else:
-  device_message       = "Intial device add",
+  device_message     = "Intial device add",
 
+if args.device_hw:
+  device_hardware    = args.device_hw
+else:
+  device_hardware    = "N/A"
 
 device_data = dict(
   ip_addr       = args.device_ip,
   os_name       = args.device_os,
   serial_number = args.device_sn,
-  hw_model      = "accton_as4610_54",
+  hw_model      = device_hardware,
   os_version    = "2.0.0-2017-07-19.1529-40fc82b_armel",
   message       = device_message,
   state         = args.device_status
