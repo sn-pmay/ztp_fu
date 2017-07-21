@@ -24,13 +24,12 @@ statuses = [
 parser = argparse.ArgumentParser()
 parser.add_argument('status', help='AEON ZTP status. Valid options are: {}'.format(statuses))
 parser.add_argument('--dry-run', help="Does input validation, prints what would be done, but doesn't actually do anything.", action='store_true')
-parser.add_argument('--ztp_host', help='Remote host against which to run. Default: localhost')
-parser.add_argument('--ztp_port', help='Remote host port against which to run. Default: 8080')
+parser.add_argument('--ztp_host', help='Remote host against which to run. Default: {}'.format(hostname))
+parser.add_argument('--ztp_port', help='Remote host port against which to run. Default: {}'.format(port))
 parser.add_argument('--ssl', help='Should the connection be treated as an SSL/TLS protected connection', action='store_true')
-parser.add_argument('--device_ip', help='The device IP for which to set the status')
-parser.add_argument('--device_os', help='The device OS')
-
-parser.add_argument('--verbose', help='Make things chatty. Implies --curl. Note: May display sensitive data like password', action='store_true')
+arser.add_argument('--device_ip', help='The device IP for which to set the status', required=True)
+parser.add_argument('--device_os', help='The device OS', required=True)
+parser.add_argument('--verbose', help='Make things chatty. Note: May display sensitive data like password', action='store_true')
 
 args = parser.parse_args()
 if args.verbose:

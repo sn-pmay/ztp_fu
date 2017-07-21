@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+# HTTPLib is not as awesome as Requests. But, in the ONL installer environment,
+# at least by default, the Requests module is not present. 
+# So.... HTTPLib it is. At least for this stage.
+# This does mean that 
 import sys
 import os
 import json
@@ -22,13 +26,14 @@ statuses         = [
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dry-run', help="Does input validation, prints what would be done, but doesn't actually do anything.", action='store_true')
-parser.add_argument('--ztp_host', help='Remote host against which to run. Default: localhost')
-parser.add_argument('--ztp_port', help='Remote host port against which to run. Default: 8080')
-parser.add_argument('--ssl', help='Should the connection be treated as an SSL/TLS protected connection', action='store_true')
-parser.add_argument('--device_ip', help='The device IP for which to set the status')
-parser.add_argument('--device_os', help='The device OS')
+parser.add_argument('--ztp_host', help='Remote host against which to run. Default: {}'.format(hostname))
+parser.add_argument('--ztp_port', help='Remote host port against which to run. Default: {}'.format(port))
+# parser.add_argument('--ssl', help='Should the connection be treated as an SSL/TLS protected connection', action='store_true')
+parser.add_argument('--device_ip', help='The device IP for which to set the status', required=True)
+parser.add_argument('--device_os', help='The device OS', required=True)
 parser.add_argument('--device_sn', help='The device SN')
-parser.add_argument('--device_status', help='Device state/status')
+parser.add_argument('--device_message', help='Optional message to be included')
+parser.add_argument('--device_status', help='Device state/status. Valid states/statuses are: {}'.format(statuses), required=True)
 parser.add_argument('--verbose', help='Make things chatty. Note: May display sensitive data like password', action='store_true')
 
 args = parser.parse_args()
@@ -65,7 +70,10 @@ device_data = dict(
   serial_number = args.device_sn,
   hw_model      = "accton_as4610_54",
   os_version    = "2.0.0-2017-07-19.1529-40fc82b_armel",
-  message       = "Intial device add",
+  if args.message:
+    message     = args.message
+  else:
+    message       = "Intial device add",
   state         = args.device_status
 )
 json_string = json.dumps(device_data)
