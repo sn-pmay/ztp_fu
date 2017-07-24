@@ -108,7 +108,7 @@ try:
     if ztp_message == "device already exists":
       print "Device with our IP and OS version already exists in the ZTP database."
       print "Spooling a DELETE"
-      conn.request('DELETE', '/api/devices?ip_addr={}'.args.device_ip)
+      conn.request('DELETE', '/api/devices?ip_addr={}'.format(args.device_ip))
     if not ztp_message == "device added":
       print "Adding device to ZTP didn't succeed:"
       print json.dumps(json.loads(data), sort_keys=True, indent=4)
