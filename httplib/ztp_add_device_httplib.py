@@ -88,9 +88,11 @@ if args.dry_run:
   print "DRY-RUN: {} {} JSON:'{}'".format(request_url, method, json_string)
   exit(0)
 
-# def add_device():
-
-# def delete_device():
+def delete_device():
+  conn.request('DELETE', '/api/devices?ip_addr={}'.format(args.device_ip))
+  r1 = conn.getresponse()
+  data = r1.read()
+  print json.dumps(json.loads(data), sort_keys=True, indent=4)
 
 try:
   conn = httplib.HTTPConnection(URL_BASE)
@@ -109,6 +111,15 @@ try:
       print "Device with our IP and OS version already exists in the ZTP database."
       print "Spooling a DELETE"
       conn.request('DELETE', '/api/devices?ip_addr={}'.format(args.device_ip))
+      r1 = conn.getresponse()
+      data = r1.read()
+      print "Now, lets re-try the add:"
+      device_data['message'] = "WARN: Device was alredy in ZTP DB. Deleted and re-added. ({}|{}|{}|{})".format(args.device_ip, args.device_os, args.device_sn, time.time())
+      json_string = json.dumps(device_data)
+      print json_string
+      conn.request(method, URL, json_string, url_headers)
+      r1 = conn.getresponse()
+      data = r1.read()
     if not ztp_message == "device added":
       print "Adding device to ZTP didn't succeed:"
       print json.dumps(json.loads(data), sort_keys=True, indent=4)
