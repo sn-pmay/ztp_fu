@@ -88,6 +88,10 @@ if args.dry_run:
   print "DRY-RUN: {} {} JSON:'{}'".format(request_url, method, json_string)
   exit(0)
 
+# def add_device():
+
+# def delete_device():
+
 try:
   conn = httplib.HTTPConnection(URL_BASE)
   if args.verbose: 
@@ -101,6 +105,10 @@ try:
   if r1.status in httpSuccessCodes:
     data = r1.read()
     ztp_message = json.loads(data)['message']
+    if ztp_message == "device already exists":
+      print "Device with our IP and OS version already exists in the ZTP database."
+      print "Spooling a DELETE"
+      conn.request('DELETE', '/api/devices?ip_addr={}'.args.device_ip)
     if not ztp_message == "device added":
       print "Adding device to ZTP didn't succeed:"
       print json.dumps(json.loads(data), sort_keys=True, indent=4)
