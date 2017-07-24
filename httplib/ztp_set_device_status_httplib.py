@@ -27,7 +27,7 @@ parser.add_argument('--dry-run', help="Does input validation, prints what would 
 parser.add_argument('--ztp_host', help='Remote host against which to run. Default: {}'.format(hostname))
 parser.add_argument('--ztp_port', help='Remote host port against which to run. Default: {}'.format(port))
 parser.add_argument('--ssl', help='Should the connection be treated as an SSL/TLS protected connection', action='store_true')
-arser.add_argument('--device_ip', help='The device IP for which to set the status', required=True)
+parser.add_argument('--device_ip', help='The device IP for which to set the status', required=True)
 parser.add_argument('--device_os', help='The device OS', required=True)
 parser.add_argument('--verbose', help='Make things chatty. Note: May display sensitive data like password', action='store_true')
 
