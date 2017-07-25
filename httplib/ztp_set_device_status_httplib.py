@@ -29,6 +29,7 @@ parser.add_argument('--ztp_port', help='Remote host port against which to run. D
 parser.add_argument('--ssl', help='Should the connection be treated as an SSL/TLS protected connection', action='store_true')
 parser.add_argument('--device_ip', help='The device IP for which to set the status', required=True)
 parser.add_argument('--device_os', help='The device OS', required=True)
+parser.add_argument('--device_message', help='Optional message to be included')
 parser.add_argument('--verbose', help='Make things chatty. Note: May display sensitive data like password', action='store_true')
 
 args = parser.parse_args()
@@ -68,12 +69,18 @@ if args.verbose: print "Request_url: \"{}\"".format(request_url)
 #   state = args.status
 # )
 
+if args.device_message:
+  device_message     = args.device_message
+else:
+  device_message     = ""
+
 # The device is found via the IP and OS tupple.
 # An update of status if the OS string has changed will fail.
 device_data = dict(
   ip_addr = args.device_ip,
   os_name = args.device_os,
-  state   = args.status
+  state   = args.status,
+  message = device_message
 )
 
 # print device_data
