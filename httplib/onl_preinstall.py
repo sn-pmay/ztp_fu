@@ -57,6 +57,11 @@ class Plugin(onl.install.Plugin.Plugin):
   def run(self, mode):
     if mode == self.PLUGIN_PREINSTALL:
       self.log.info("hello from preinstall plugin")
+      if os.environ["onie_exec_url"]:
+        parsed = urlparse.parse_qs(urlparse.urlparse(os.environ["onie_exec_url"]).query)
+        if "ztp" not in parsed.keys():
+          self.log.info("ztp variable not set in the onie_exec_url environment variable. ZTP not called for")
+          return 0
       # Parsing out the environment variables
       if "onie_disco_siaddr" in os.environ:
         hostname = os.environ["onie_disco_siaddr"]

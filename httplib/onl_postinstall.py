@@ -61,12 +61,19 @@ import logging
 import time
 import httplib
 import socket
+import urlparse
 from httplib import HTTPConnection
 
 class Plugin(onl.install.Plugin.Plugin):
   def run(self, mode):
     if mode == self.PLUGIN_POSTINSTALL:
       self.log.info("hello from preinstall plugin")
+      if os.environ["onie_exec_url"]:
+        parsed = urlparse.parse_qs(urlparse.urlparse(os.environ["onie_exec_url"]).query)
+        if "ztp" not in parsed.keys():
+          self.log.info("ztp variable not set in the onie_exec_url environment variable. ZTP not called for")
+          return 0
+
       # Parsing out the environment variables
       device_ip = os.environ["onie_disco_ip"]
       device_os = os.uname()[2]
