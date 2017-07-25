@@ -39,23 +39,23 @@ method is invoked multiple times during the installer with different
 values of 'mode'. The 'shutdown()' method is called only once.
 
 """
+import onl.install.Plugin
+import platform
+from onl.platform.current import OnlPlatform
+import sys
+import os
+import json
+import argparse
+import subprocess
+import logging
+import time
+import httplib
+import socket
+from httplib import HTTPConnection
 
 class Plugin(onl.install.Plugin.Plugin):
   def run(self, mode):
     if mode == self.PLUGIN_PREINSTALL:
-      import onl.install.Plugin
-      import platform
-      from onl.platform.current import OnlPlatform
-      import sys
-      import os
-      import json
-      import argparse
-      import subprocess
-      import logging
-      import time
-      import httplib
-      import socket
-      from httplib import HTTPConnection
       self.log.info("hello from preinstall plugin")
       # Parsing out the environment variables
       if "onie_disco_siaddr" in os.environ:
@@ -78,7 +78,9 @@ class Plugin(onl.install.Plugin.Plugin):
       else:
         self.log.warn("WARN: onie_serial_num not set. Onie issue on this HW platform?")
         device_sn = "9999999"
+
       device_os = os.uname()[2]
+
       device_data = dict(
         ip_addr       = device_ip,
         os_name       = device_os,
@@ -108,7 +110,7 @@ class Plugin(onl.install.Plugin.Plugin):
         conn.request('DELETE', '/api/devices?ip_addr={}'.format(device_ip))
         r1 = conn.getresponse()
         data = r1.read()
-        print json.dumps(json.loads(data), sort_keys=True, indent=4)
+        self.log.info(json.dumps(json.loads(data), sort_keys=True, indent=4))
 
       try:
         conn = httplib.HTTPConnection(URL_BASE)
@@ -119,35 +121,36 @@ class Plugin(onl.install.Plugin.Plugin):
         conn.request(method, URL, json_string, url_headers)
         r1 = conn.getresponse()
         if verbose:
-          print "Response: {}, reason: {}".format(r1.status, r1.reason)
+          self.log.info("Response: {}, reason: {}".format(r1.status, r1.reason))
         if r1.status in httpSuccessCodes:
           data = r1.read()
           ztp_message = json.loads(data)['message']
           if ztp_message == "device already exists":
+            self.log.info("ZTP already had this device in its inventory. Deleting.")
             delete_device
-            print "Now, lets re-try the add:"
+            self.log.info("Now, lets re-try the add:")
             device_data['message'] = "WARN: Device was alredy in ZTP DB. Deleted and re-added. ({}|{}|{}|{})".format(device_ip, device_os, device_sn, time.time())
             json_string = json.dumps(device_data)
-            print json_string
+            self.log.info(json_string)
             conn.request(method, URL, json_string, url_headers)
             r1 = conn.getresponse()
             data = r1.read()
           if not ztp_message == "device added":
-            print "Adding device to ZTP didn't succeed:"
-            print json.dumps(json.loads(data), sort_keys=True, indent=4)
+            self.log.warn("Adding device to ZTP didn't succeed:")
+            self.log.warn(json.dumps(json.loads(data), sort_keys=True, indent=4))
         else:
-          print "Response: {}, reason: {}".format(r1.status, r1.reason)
-          print "Non-200 HTTP response seen. Something went awry."
+          self.log.warn("Response: {}, reason: {}".format(r1.status, r1.reason))
+          self.log.warn("Non-200 HTTP response seen. Something went awry.")
           data = r1.read()
-          print json.dumps(json.loads(data), sort_keys=True, indent=4)
+          self.log.info(json.dumps(json.loads(data), sort_keys=True, indent=4))
       except ValueError as e:
-        print "Got the following data back: {}".format(data)
-        print "JSON parse error: {}".format(e)
+        self.log.err("Got the following data back: {}".format(data))
+        self.log.err("JSON parse error: {}".format(e))
         return 0
       except socket.error as e:
-        print "ERROR: Socket Error"
-        print "Tried to access 'http://{}'".format(URL_BASE)
-        print "ERROR: {}".format(e)
+        self.log.err("ERROR: Socket Error")
+        self.log.err("Tried to access 'http://{}'".format(URL_BASE))
+        self.log.err("ERROR: {}".format(e))
         return 0
       return 0
     return 0
