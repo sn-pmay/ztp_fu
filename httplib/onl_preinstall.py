@@ -59,12 +59,12 @@ class Plugin(onl.install.Plugin.Plugin):
       self.log.info("hello from preinstall plugin")
       # Parsing out the environment variables
       if "onie_disco_siaddr" in os.environ:
-        hostname = os.environ("onie_disco_siaddr")
+        hostname = os.environ["onie_disco_siaddr"]
       else:
         self.log.warn("WARN: onie_disco_siaddr not set. ZTP not performed")
         return 0
       if "onie_disco_ip" in os.environ:
-        ip_addr = os.environ("onie_disco_ip")
+        ip_addr = os.environ["onie_disco_ip"]
       else:
         self.log.warn("WARN: onie_disco_ip not set. ZTP not performed")
         return 0
@@ -74,7 +74,7 @@ class Plugin(onl.install.Plugin.Plugin):
         self.log.warn("WARN: OnlPlatform.MODEL does not seem to be set.")
         device_hw = ""
       if "onie_serial_num" in os.environ:
-        device_sn = os.environ("onie_serial_num")
+        device_sn = os.environ["onie_serial_num"]
       else:
         self.log.warn("WARN: onie_serial_num not set. Onie issue on this HW platform?")
         device_sn = "9999999"
