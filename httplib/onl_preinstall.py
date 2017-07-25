@@ -64,7 +64,7 @@ class Plugin(onl.install.Plugin.Plugin):
         self.log.warn("WARN: onie_disco_siaddr not set. ZTP not performed")
         return 0
       if "onie_disco_ip" in os.environ:
-        ip_addr = os.environ["onie_disco_ip"]
+        device_ip = os.environ["onie_disco_ip"]
       else:
         self.log.warn("WARN: onie_disco_ip not set. ZTP not performed")
         return 0
@@ -87,7 +87,7 @@ class Plugin(onl.install.Plugin.Plugin):
         serial_number = device_sn,
         hw_model      = device_hw,
         os_version    = platform.platform(terse=1),
-        message       = "preinstall.py",
+        message       = "ONL preinstall.py",
         state         = "OS-INSTALL"
       )
       # Need to convert the dict to a json object for the httplib connection later
@@ -102,9 +102,14 @@ class Plugin(onl.install.Plugin.Plugin):
         'START', 'DONE', 'CONFIG', 'AWAIT-ONLINE', 'AWAIT-SYSTEM-READY', 
         'OS-INSTALL', 'OS-REBOOTING', 'FAILED'
       ]
+      URL_BASE = '{}:{}'.format(hostname, port)
+      URL = '/api/devices'
+      url_headers = {'Content-Type': 'application/json', 'Accept': 'application/json' }
+      request_url="{}://{}{}".format(protocol, URL_BASE, URL)
+      if verbose: self.log.info("Request_url: \"{}\"".format(request_url))
       if verbose:
         self.log.info("****** Verbose mode ****")
-        self.log.info("DeviceData:".format(device_data))
+        self.log.info("DeviceData:".format(json.dumps(device_data)))
       
       def delete_device():
         conn.request('DELETE', '/api/devices?ip_addr={}'.format(device_ip))
@@ -127,9 +132,9 @@ class Plugin(onl.install.Plugin.Plugin):
           ztp_message = json.loads(data)['message']
           if ztp_message == "device already exists":
             self.log.info("ZTP already had this device in its inventory. Deleting.")
-            delete_device
+            delete_device()
             self.log.info("Now, lets re-try the add:")
-            device_data['message'] = "WARN: Device was alredy in ZTP DB. Deleted and re-added. ({}|{}|{}|{})".format(device_ip, device_os, device_sn, time.time())
+            device_data['message'] = "ONL preinstall.py WARN: Device was alredy in ZTP DB. Deleted and re-added. ({}|{}|{}).".format(device_ip, device_os, device_sn)
             json_string = json.dumps(device_data)
             self.log.info(json_string)
             conn.request(method, URL, json_string, url_headers)
