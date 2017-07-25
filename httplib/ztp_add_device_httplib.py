@@ -3,7 +3,7 @@
 # HTTPLib is not as awesome as Requests. But, in the ONL installer environment,
 # at least by default, the Requests module is not present. 
 # So.... HTTPLib it is. At least for this stage.
-# This does mean that 
+# This does mean that there's no support for niceties like SSL, or basic HTTP auth
 import sys
 import os
 import json
