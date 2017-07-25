@@ -51,6 +51,7 @@ import logging
 import time
 import httplib
 import socket
+import urlparse
 from httplib import HTTPConnection
 
 class Plugin(onl.install.Plugin.Plugin):
